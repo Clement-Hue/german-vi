@@ -2,11 +2,11 @@ from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, LEF
 
 
 class Window:
-    def __init__(self, words, on_validate, on_continue):
+    def __init__(self, words, on_validate, on_next):
         self._window = Tk()
         self.words = words
         self.on_validate = on_validate
-        self.on_continue = on_continue
+        self.on_next = on_next
         self.answer = StringVar()
         self.label = StringVar()
         self._window.geometry("700x700")
@@ -21,7 +21,7 @@ class Window:
         for i in range(len(self.words)):
             word = self.words[i]
             checkbox_var = IntVar(value=1 if word.selected else 0)
-            checkbox = Checkbutton(frame, text=word.infinitive, variable=checkbox_var)
+            checkbox = Checkbutton(frame, text=word.infinitive, variable=checkbox_var ,font=("Arial", 15))
             checkbox.config(command=lambda w=word, c=checkbox_var: self._on_check(w, c))
             checkbox.grid(row=i//5, column=i%5)
             checkboxes.append((checkbox, word))
@@ -46,26 +46,33 @@ class Window:
         self._start_w.pack()
 
     def _on_start(self):
-        self._clean_window()
-        Label(self._window,textvariable=self.label, font=("Helvetica", 16)).pack()
-        Label(self._window, text="Answer:").pack()
-        txtfield = Entry(self._window,textvariable=self.answer, bg='white', bd=5)
-        txtfield.pack()
-        txtfield.focus_set()
-        self._validate_w = Button(self._window, text="Validate", fg='blue', command=self._on_validate)
-        self._continue_w = Button(self._window, text="Continue", fg='blue', command=self._on_continue)
-        self._error_w = Label(self._window, fg="red")
-        self._validate_w.pack()
-        self.on_continue(self)
+        try:
+            self.on_next(self)
+            self._clean_window()
+            Label(self._window,textvariable=self.label, font=("Helvetica", 16)).pack()
+            Label(self._window, text="Answer:").pack()
+            self._textfield_w = Entry(self._window, textvariable=self.answer, bg='white', bd=5)
+            self._textfield_w.pack()
+            self._textfield_w.focus_set()
+            self._textfield_w.bind("<Return>", self._on_validate)
+            self._validate_w = Button(self._window, text="Validate", fg='blue', command=self._on_validate)
+            self._continue_w = Button(self._window, text="Continue", fg='blue', command=self.next)
+            self._continue_w.bind("<Return>", self.next)
+            self._error_w = Label(self._window, fg="red")
+            self._validate_w.pack()
+        except IndexError:
+            Label(self._window, fg="red", text="Please select at least one verb").pack()
 
-    def _on_continue(self):
+
+    def next(self, e=None):
+        self._textfield_w.focus_set()
         self._continue_w.pack_forget()
         self._error_w.pack_forget()
         self.answer.set("")
         self._validate_w.pack()
-        self.on_continue(self)
+        self.on_next(self)
 
-    def _on_validate(self):
+    def _on_validate(self, e=None):
         self.on_validate(self)
 
     def run(self):
@@ -74,6 +81,7 @@ class Window:
     def show_error(self, expected_answer):
         self._validate_w.pack_forget()
         self._continue_w.pack()
+        self._continue_w.focus_set()
         self._error_w.config(text=f"WRONG, the answer was {expected_answer}")
         self._error_w.pack()
 
