@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, IntVar, LEFT, RIGHT
 
+from game import Game
+
 
 class WordSelectionFrame:
     def __init__(self, words, window):
@@ -126,9 +128,9 @@ class ScoreScreen(BaseScreen):
 
 
 class Window:
-    def __init__(self, game):
+    def __init__(self):
         self._window = Tk()
-        self.game = game
+        self.game = Game()
         self._window.geometry("700x700")
         self._window.title('German strong verbs')
         self._first_screen = FirstScreen(self._window, self.game.words,
@@ -138,7 +140,7 @@ class Window:
 
     def _on_start(self, tries):
         try:
-            self.game.tries = tries
+            self.game.start(tries)
             self._main_screen()
             self._new_question()
         except IndexError:
@@ -149,7 +151,6 @@ class Window:
         self._window.mainloop()
 
     def _on_restart(self):
-        self.game.reset()
         self._first_screen()
 
     def _new_question(self):

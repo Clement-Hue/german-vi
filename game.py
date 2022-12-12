@@ -11,10 +11,9 @@ class Game:
     words = []
     forms = ["Present tense", "Simple past", "Past participle", "Definition"]
 
-
-    def __init__(self, tries=50):
+    def __init__(self):
         self._load_words()
-        self.tries = tries
+        self.tries = 0
         self._count = 0
         self.success = 0
         self._word, self._form = None, None
@@ -22,10 +21,10 @@ class Game:
     def __bool__(self):
         return self._count < self.tries
 
-    def reset(self):
+    def start(self, tries):
         self._count = 0
         self.success = 0
-        self.tries = 0
+        self.tries = tries
     def _load_words(self):
         with open("words.csv") as csvfile:
             content = csv.reader(csvfile)
