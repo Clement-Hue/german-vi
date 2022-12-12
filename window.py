@@ -14,7 +14,9 @@ class Window:
         self._widgets()
 
     def _widgets(self):
-        Entry(self._window,textvariable=self.answer, bg='white', bd=5).grid(row=1, column=1)
+        txtfield = Entry(self._window,textvariable=self.answer, bg='white', bd=5)
+        txtfield.grid(row=1, column=1)
+        txtfield.focus_set()
         self._validate_w = Button(self._window, text="Validate", fg='blue', command=self._on_validate)
         self._continue_w = Button(self._window, text="Continue", fg='blue', command=self._on_continue)
         self._error_w = Label(self._window, fg="red")
