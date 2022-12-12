@@ -5,6 +5,7 @@ class Word:
         self.infinitive = infinitive
         self.definition = definition
         self.forms = forms
+        self.selected = True
 
 class Game:
     words = []
@@ -32,7 +33,7 @@ class Game:
 
     def question(self):
         self._count += 1
-        self._word = random.choice(self.words)
+        self._word = random.choice(list(filter(lambda w: w.selected ,self.words)))
         self._form = random.choice(list(self._word.forms))
         return self._word, self._form
 

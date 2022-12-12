@@ -6,12 +6,11 @@ class Application:
     def __init__(self):
         tries = input("Number of try: ")
         self.game = Game(int(tries))
-        word, form = self.game.question()
-        self.window = Window(word, form, on_validate=self.on_validate,
+        self.window = Window(words= self.game.words, on_validate=self.on_validate,
                         on_continue=self.on_continue)
 
-    def start(self):
-        self.window.start()
+    def run(self):
+        self.window.run()
 
     def on_validate(self, w: Window):
         if not self.game.answer(w.answer.get()):

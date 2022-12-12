@@ -1,56 +1,90 @@
-from tkinter import Tk, Button, Entry, Label, StringVar
+from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, LEFT, IntVar
 
 
 class Window:
-    def __init__(self, word, form, on_validate, on_continue):
+    def __init__(self, words, on_validate, on_continue):
         self._window = Tk()
+        self.words = words
         self.on_validate = on_validate
         self.on_continue = on_continue
         self.answer = StringVar()
         self.label = StringVar()
-        self._window.geometry("500x300")
+        self._window.geometry("700x700")
         self._window.title('German strong verbs')
-        self.set_label(word, form)
-        self._widgets()
+        self._first_screen()
 
-    def _widgets(self):
+    def _on_check(self, word, checkbox: IntVar):
+        word.selected = bool(checkbox.get())
+    def _show_words(self, checkboxes):
+        frame = Frame(self._window)
+        frame.pack()
+        for i in range(len(self.words)):
+            word = self.words[i]
+            checkbox_var = IntVar(value=1 if word.selected else 0)
+            checkbox = Checkbutton(frame, text=word.infinitive, variable=checkbox_var)
+            checkbox.config(command=lambda w=word, c=checkbox_var: self._on_check(w, c))
+            checkbox.grid(row=i//5, column=i%5)
+            checkboxes.append((checkbox, word))
+
+    def _select_all(self, checkboxes):
+        for checkbox in checkboxes:
+            checkbox[0].select()
+            checkbox[1].selected = True
+
+    def _unselect_all(self, checkboxes):
+        for checkbox in checkboxes:
+            checkbox[0].deselect()
+            checkbox[1].selected = False
+
+    def _first_screen(self):
+        checkboxes = []
+        self._show_words(checkboxes)
+        Button(self._window, text="All", command= lambda : self._select_all(checkboxes)).pack()
+        Button(self._window, text="None", command= lambda : self._unselect_all(checkboxes)).pack()
+        self._start_w = Button(self._window, text="Start", fg='Green',  font=("Arial", 30),
+                               command=self._on_start)
+        self._start_w.pack()
+
+    def _on_start(self):
+        self._clean_window()
+        Label(self._window,textvariable=self.label, font=("Helvetica", 16)).pack()
+        Label(self._window, text="Answer:").pack()
         txtfield = Entry(self._window,textvariable=self.answer, bg='white', bd=5)
-        txtfield.grid(row=1, column=1)
+        txtfield.pack()
         txtfield.focus_set()
         self._validate_w = Button(self._window, text="Validate", fg='blue', command=self._on_validate)
         self._continue_w = Button(self._window, text="Continue", fg='blue', command=self._on_continue)
         self._error_w = Label(self._window, fg="red")
-        Label(self._window,textvariable=self.label, font=("Helvetica", 16)).grid(row=0, columnspan=2)
-        Label(self._window, text="Answer:").grid(row=1, column=0)
-        self._validate_w.grid(row=2, columnspan=2)
+        self._validate_w.pack()
+        self.on_continue(self)
 
     def _on_continue(self):
-        self._continue_w.grid_forget()
-        self._error_w.grid_forget()
+        self._continue_w.pack_forget()
+        self._error_w.pack_forget()
         self.answer.set("")
-        self._validate_w.grid(row=2, columnspan=2)
+        self._validate_w.pack()
         self.on_continue(self)
 
     def _on_validate(self):
         self.on_validate(self)
 
-    def start(self):
+    def run(self):
         self._window.mainloop()
 
     def show_error(self, expected_answer):
-        self._validate_w.grid_forget()
-        self._continue_w.grid(row=2, columnspan=2)
+        self._validate_w.pack_forget()
+        self._continue_w.pack()
         self._error_w.config(text=f"WRONG, the answer was {expected_answer}")
-        self._error_w.grid(row=3, columnspan=2)
+        self._error_w.pack()
 
     def show_result(self, success, tries):
         self._clean_window()
-        Label(self._window, text=f"Result:{success} / {tries}", font=("Arial", 50)).grid(row=0)
+        Label(self._window, text=f"Result:{success} / {tries}", font=("Arial", 50)).pack()
 
     def _clean_window(self):
         for widget in self._window.winfo_children():
-            widget.grid_forget()
+            widget.pack_forget()
 
     def set_label(self, word, form):
-        self.label.set(f"Word: {word.infinitive} / {word.definition}\n"
+        self.label.set(f"{word.infinitive} / {word.definition}\n"
                     f"{form}")
