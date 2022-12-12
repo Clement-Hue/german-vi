@@ -28,7 +28,7 @@ class Game:
             next(content)
             for row in content:
                 self.words.append(Word(infinitive=row[0], definition=row[4],
-                                       forms= dict(zip(self.forms, row[1:-1])
+                                       forms=dict(zip(self.forms, row[1:-1])
                                                    )))
 
     def question(self):
