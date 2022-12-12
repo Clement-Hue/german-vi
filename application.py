@@ -4,8 +4,7 @@ from window import Window
 
 class Application:
     def __init__(self):
-        tries = input("Number of try: ")
-        self.game = Game(int(tries))
+        self.game = Game()
         self.window = Window(self.game)
 
     def run(self):

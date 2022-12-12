@@ -22,6 +22,10 @@ class Game:
     def __bool__(self):
         return self._count < self.tries
 
+    def reset(self):
+        self._count = 0
+        self.success = 0
+        self.tries = 0
     def _load_words(self):
         with open("words.csv") as csvfile:
             content = csv.reader(csvfile)
