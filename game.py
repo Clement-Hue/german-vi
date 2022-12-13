@@ -25,6 +25,7 @@ class Game:
         self._count = 0
         self.success = 0
         self.tries = tries
+
     def _load_words(self):
         with open("words.csv", encoding="utf8") as csvfile:
             content = csv.reader(csvfile)
