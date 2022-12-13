@@ -1,5 +1,6 @@
 from abc import abstractmethod
-from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, IntVar, LEFT, RIGHT
+from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, IntVar, LEFT, RIGHT, INSERT, TOP
+from tkinter.font import nametofont
 
 from game import Game
 
@@ -63,23 +64,35 @@ class MainView(View):
         super().__init__(window)
         self._answer = StringVar()
         self._label = StringVar()
-        self._question_w = Label(window, textvariable=self._label, font=("Helvetica", 16))
-        self._textfield_label_w = Label(window, text="Answer:")
-        self._textfield_w = Entry(window, textvariable=self._answer, bg='white', bd=5)
-        self._textfield_w.bind("<Return>", lambda e: on_validate(self._answer.get()))
-        self._validate_w = Button(window, text="Validate", fg='blue', command=lambda: on_validate(self._answer.get()))
-        self._continue_w = Button(window, text="Continue", fg='blue', command=on_continue)
+        self._parent_frame = Frame(window)
+        Label(self._parent_frame, textvariable=self._label).pack()
+        self._create_answer_frame(self._parent_frame,on_validate=on_validate)
+        self._validate_w = Button(self._parent_frame, text="Validate", fg='blue', command=lambda: on_validate(self._answer.get()))
+        self._continue_w = Button(self._parent_frame, text="Continue", fg='blue', command=on_continue)
         self._continue_w.bind("<Return>", lambda e: on_continue())
-        self._error_w = Label(window, fg="red")
+        self._error_w = Label(self._parent_frame, fg="red")
 
+    def _create_answer_frame(self, parent, on_validate):
+        frame = Frame(parent)
+        Label(frame, text="Answer:", font=("Arial", 15)).pack(side=TOP)
+        self._textfield_w = Entry(frame, textvariable=self._answer, bg='white', font=("Arial", 20), bd=5)
+        self._textfield_w.bind("<Return>", lambda e: on_validate(self._answer.get()))
+        self._textfield_w.pack(side=LEFT)
+        Button(frame, text="ß", command=self._add_eszett).pack(side=RIGHT, padx=10)
+        frame.pack()
+
+    def _add_eszett(self):
+        self._answer.set(self._answer.get() + "ß")
+        pos = self._textfield_w.index(INSERT)
+        self._textfield_w.icursor(pos + 1)
     def _show(self, label: str):
         self._label.set(label)
         self._answer.set("")
-        self._question_w.pack()
-        self._textfield_label_w.pack()
-        self._textfield_w.pack()
-        self._textfield_w.focus_set()
+        self._parent_frame.pack(expand=True)
         self._validate_w.pack()
+        self._textfield_w.focus_set()
+        self._continue_w.pack_forget()
+        self._error_w.pack_forget()
 
     def show_error(self, expected_answer):
         self._validate_w.pack_forget()
@@ -94,13 +107,13 @@ class SettingView(View):
         super().__init__(window)
         self._words = words
         self._on_start = on_start
-        self._tries = IntVar()
-        self._start_btn = Button(self._window, text="Start", fg='Green', font=("Arial", 30),
+        self._tries = IntVar(value=10)
+        self._start_btn = Button(self._window, text="Start", fg='Green',
                                  command=lambda: self._on_start(self._tries.get()))
         self._word_selection = WordSelectionFrame(self._words, self._window)
         self._try_frame = Frame(self._window)
         Label(self._try_frame, text="Number of try").pack(side=LEFT)
-        Entry(self._try_frame, textvariable=self._tries).pack(side=RIGHT)
+        Entry(self._try_frame, textvariable=self._tries, font=("Arial", 20)).pack(side=RIGHT)
         self._error_label = Label(self._window, fg="red")
 
     def _show(self):
@@ -116,13 +129,14 @@ class ScoreView(View):
     def __init__(self, window, on_restart):
         super().__init__(window)
         self._on_restart = on_restart
-        self._score_label = Label(self._window, font=("Arial", 50))
-        self._restart_btn = Button(self._window, text="Restart", command=self._on_restart)
+        self._parent_frame = Frame(window)
+        self._score_label = Label(self._parent_frame, font=("Arial", 50))
+        self._score_label.pack()
+        Button(self._parent_frame, text="Restart", command=self._on_restart).pack()
 
     def _show(self, success, tries):
         self._score_label.config(text=f"Score: {success} / {tries}")
-        self._score_label.pack()
-        self._restart_btn.pack()
+        self._parent_frame.pack(expand=True)
 
 
 class Window:
@@ -131,6 +145,8 @@ class Window:
         self.game = Game()
         self._window.geometry("700x700")
         self._window.title('German strong verbs')
+        default_font = nametofont("TkDefaultFont")
+        default_font.configure(size=20, family="Arial")
         self._setting_view = SettingView(self._window, self.game.words,
                                          on_start=self._on_start)
         self._main_view = MainView(self._window, on_validate=self._on_validate, on_continue=self._new_question)
