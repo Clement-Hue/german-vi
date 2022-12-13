@@ -44,7 +44,7 @@ class WordSelectionFrame:
             checkbox[1].selected = False
 
 
-class BaseScreen:
+class View:
     def __init__(self, window):
         self._window = window
 
@@ -58,7 +58,7 @@ class BaseScreen:
         self._show(*args, **kwargs)
 
 
-class MainScreen(BaseScreen):
+class MainView(View):
     def __init__(self, window, on_validate, on_continue):
         super().__init__(window)
         self._answer = StringVar()
@@ -72,7 +72,9 @@ class MainScreen(BaseScreen):
         self._continue_w.bind("<Return>", lambda e: on_continue())
         self._error_w = Label(window, fg="red")
 
-    def _show(self):
+    def _show(self, label: str):
+        self._label.set(label)
+        self._answer.set("")
         self._question_w.pack()
         self._textfield_label_w.pack()
         self._textfield_w.pack()
@@ -86,16 +88,8 @@ class MainScreen(BaseScreen):
         self._error_w.config(text=f"WRONG, the answer was {expected_answer}")
         self._error_w.pack()
 
-    def reset(self, label: str):
-        self._label.set(label)
-        self._answer.set("")
-        self._textfield_w.focus_set()
-        self._continue_w.pack_forget()
-        self._error_w.pack_forget()
-        self._validate_w.pack()
 
-
-class FirstScreen(BaseScreen):
+class SettingView(View):
     def __init__(self, window, words, on_start):
         super().__init__(window)
         self._words = words
@@ -107,14 +101,18 @@ class FirstScreen(BaseScreen):
         self._try_frame = Frame(self._window)
         Label(self._try_frame, text="Number of try").pack(side=LEFT)
         Entry(self._try_frame, textvariable=self._tries).pack(side=RIGHT)
+        self._error_label = Label(self._window, fg="red")
 
     def _show(self):
         self._word_selection.show_words()
         self._try_frame.pack()
         self._start_btn.pack()
 
+    def show_error(self, error: str):
+        self._error_label.config(text=error)
+        self._error_label.pack()
 
-class ScoreScreen(BaseScreen):
+class ScoreView(View):
     def __init__(self, window, on_restart):
         super().__init__(window)
         self._on_restart = on_restart
@@ -133,37 +131,36 @@ class Window:
         self.game = Game()
         self._window.geometry("700x700")
         self._window.title('German strong verbs')
-        self._first_screen = FirstScreen(self._window, self.game.words,
+        self._setting_view = SettingView(self._window, self.game.words,
                                          on_start=self._on_start)
-        self._main_screen = MainScreen(self._window, on_validate=self._on_validate, on_continue=self._new_question)
-        self._score_screen = ScoreScreen(self._window, on_restart=self._on_restart)
+        self._main_view = MainView(self._window, on_validate=self._on_validate, on_continue=self._new_question)
+        self._score_view = ScoreView(self._window, on_restart=self._on_restart)
 
     def _on_start(self, tries):
         try:
             self.game.start(tries)
-            self._main_screen()
             self._new_question()
         except IndexError:
-            Label(self._window, fg="red", text="Please select at least one verb").pack()
+            self._setting_view.show_error("Please select at least a verb")
 
     def run(self):
-        self._first_screen()
+        self._setting_view()
         self._window.mainloop()
 
     def _on_restart(self):
-        self._first_screen()
+        self._setting_view()
 
     def _new_question(self):
         if not self.game:
-            self._score_screen(success=self.game.success, tries=self.game.tries)
+            self._score_view(success=self.game.success, tries=self.game.tries)
             return
         word, form = self.game.question()
-        self._main_screen.reset(
+        self._main_view(
             f"{word.infinitive} / {word.definition}\n"
             f"{form}")
 
     def _on_validate(self, answer):
         if not self.game.answer(answer):
-            self._main_screen.show_error(self.game.expected_answer)
+            self._main_view.show_error(self.game.expected_answer)
         else:
             self._new_question()
