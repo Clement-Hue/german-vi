@@ -11,7 +11,7 @@ class Window:
         self._window.geometry("700x700")
         self._window.title('German strong verbs')
         default_font = nametofont("TkDefaultFont")
-        default_font.configure(size=20, family="Arial")
+        default_font.configure(size=25, family="Arial")
         self._setting_view = SettingView(self._window, self.game.words,
                                          on_start=self._on_start)
         self._main_view = MainView(self._window, on_validate=self._on_validate, on_continue=self._new_question)
