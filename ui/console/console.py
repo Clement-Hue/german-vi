@@ -9,8 +9,8 @@ class Console(Application):
         self.game = game
 
     def run(self):
-        tries = input("Number of try: ")
-        self.game.init(int(tries))
+        nb_question = input("Number of questions: ")
+        self.game.init(int(nb_question))
         while self.game:
             question = self.game.create_question()
             question.on_answer(self._handle_answer)
@@ -19,7 +19,4 @@ class Console(Application):
         print(f"\nscore {self.game.state.success} / {self.game.state.answered}")
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args):
-        if is_correct:
-            print("Good answer")
-        else:
-            print(f"Wrong ! The answer is {correct_answer}")
+        print("Good answer") if is_correct else print(f"Wrong ! The answer is {correct_answer}")

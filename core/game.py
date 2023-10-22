@@ -1,4 +1,5 @@
 import csv
+from typing import Optional
 from core.word import Word
 from core.question import Question
 from core.state import State
@@ -13,17 +14,21 @@ class Game:
         """
         self.words = []
         self.forms = []
-        self.state = None
+        self.state: Optional[State] = None
         self._load_words(csv_path)
 
     def __bool__(self):
         """
         :return: True if the game is still on going
         """
-        return self.state.answered < self.state.tries
+        return self.state.answered < self.state.nb_question
 
-    def init(self, tries: int = 1):
-        self.state = State(tries=tries)
+    def init(self, nb_question: int = 1):
+        """
+        Initialise the game with the number of questions
+        :param nb_question: number of questions ask during the game
+        """
+        self.state = State(nb_question=nb_question)
 
     def create_question(self):
         question = Question(words=self.words)

@@ -33,7 +33,7 @@ class Window(Application):
 
     def _new_question(self):
         if not self.game:
-            self._score_view(success=self.game.success, tries=self.game.tries)
+            self._score_view(success=self.game.success, tries=self.game.nb_question)
             return
         word, form = self.game.create_question()
         self._main_view(

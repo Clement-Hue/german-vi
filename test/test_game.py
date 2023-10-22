@@ -68,8 +68,8 @@ def test_state_success(game):
 
 def test_start_state(game):
     game.init(10)
-    assert game.state.tries == 10
+    assert game.state.nb_question == 10
     game.state.answered = 2
     game.state.success = 1
     game.init(2)
-    assert game.state == State(tries=2)
+    assert game.state == State(nb_question=2)
