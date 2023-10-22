@@ -1,6 +1,6 @@
-
+from typing import Dict
 class Word:
-    def __init__(self, infinitive, definition, forms = None):
+    def __init__(self, infinitive: str, definition: str, forms: Dict[str, str] = None):
         self.infinitive = infinitive
         self.definition = definition
         self.forms = forms

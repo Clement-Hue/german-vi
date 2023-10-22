@@ -1,46 +1,48 @@
-import random, csv
-from typing import List
+import csv
 from core.word import Word
+from core.question import Question
+from core.state import State
 
 
 class Game:
-    words = []
 
     def __init__(self, csv_path: str):
+        """
+        :param csv_path: CSV must contain header with 'definition' and 'infinitive' columns,
+        the other columns will be treated as tense
+        """
+        self.words = []
+        self.forms = []
+        self.state = None
         self._load_words(csv_path)
-        self.tries = 0
-        self._count = 0
-        self.success = 0
-        self._word, self._form = None, None
 
     def __bool__(self):
-        return self._count < self.tries
+        """
+        :return: True if the game is still on going
+        """
+        return self.state.answered < self.state.tries
 
-    def start(self, tries):
-        self._count = 0
-        self.success = 0
-        self.tries = tries
+    def start(self, tries = 1):
+        self.state = State(tries=tries)
 
     def _load_words(self, csv_path: str):
         with open(csv_path, encoding="utf8") as csvfile:
             content = csv.DictReader(csvfile)
+            columns_to_exclude = ["infinitive", "definition"]
+            self.forms = [x for x in content.fieldnames if x not in columns_to_exclude ]
             for row in content:
-                self.words.append(Word(infinitive=row["infinitive"], definition=row["definition"],
-                                       forms={key: row[key] for key in row if key not in ["infinitive", "definition"]}
+                self.words.append(Word(infinitive=row[columns_to_exclude[0]], definition=row[columns_to_exclude[1]],
+                                       forms={key: row[key] for key in self.forms}
                                    ))
 
     def question(self):
-        self._count += 1
-        self._word = random.choice(list(filter(lambda w: w.selected ,self.words)))
-        self._form = random.choice(list(self._word.headers))
-        return self._word, self._form
+        question = Question(words=self.words)
+        question.on_answer(self._handle_answer)
+        return question
 
-    def answer(self, res):
-        if res == self.expected_answer:
-            self.success += 1
-            return True
-        return False
-
-    @property
-    def expected_answer(self):
-        return self._word.headers[self._form]
+    def _handle_answer(self, is_correct: bool):
+        if self.state is None:
+            return
+        self.state.answered += 1
+        if is_correct:
+            self.state.success += 1
