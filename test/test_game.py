@@ -1,4 +1,5 @@
 import pytest
+from core.state import State
 from core.game import Game
 from core.word import Word
 from core.question import Question
@@ -30,7 +31,7 @@ def test_load_forms(game):
     assert game.forms == ["present", "simple past", "past participle"]
 
 def test_generate_question(game):
-    question = game.question()
+    question = game.create_question()
     assert question.word in game.words
     assert question.form in game.forms
 
@@ -52,15 +53,23 @@ def test_answer_question():
 
 def test_state_answered(game):
     game.start()
-    question = game.question()
+    question = game.create_question()
     question.answer("ff")
     assert game.state.answered == 1
     assert game.state.success == 0
 
 def test_state_success(game):
     game.start()
-    question = game.question()
+    question = game.create_question()
     correct_answer = question.word.forms[question.form]
     question.answer(correct_answer)
     assert game.state.answered == 1
     assert game.state.success == 1
+
+def test_start_state(game):
+    game.start(10)
+    assert game.state.tries == 10
+    game.state.answered = 2
+    game.state.success = 1
+    game.start(2)
+    assert game.state == State(tries=2)

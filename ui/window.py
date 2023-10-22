@@ -1,7 +1,7 @@
 from tkinter import Tk
 from tkinter.font import nametofont
 
-from views import MainView, SettingView, ScoreView
+from ui.views import MainView, SettingView, ScoreView
 
 class Window:
     def __init__(self, game):
@@ -34,7 +34,7 @@ class Window:
         if not self.game:
             self._score_view(success=self.game.success, tries=self.game.tries)
             return
-        word, form = self.game.question()
+        word, form = self.game.create_question()
         self._main_view(
             f"{word.infinitive} / {word.definition}\n"
             f"{form}")
