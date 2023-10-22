@@ -1,6 +1,6 @@
-
 from abc import abstractmethod
-from tkinter import Tk, Button, Entry, Label, StringVar, Checkbutton, Frame, IntVar, LEFT, RIGHT, INSERT, TOP
+from tkinter import Button, Entry, Label, StringVar, Checkbutton,\
+    Frame, IntVar, LEFT, RIGHT, INSERT, TOP
 
 
 class WordSelectionFrame:

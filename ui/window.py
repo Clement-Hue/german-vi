@@ -1,13 +1,12 @@
 from tkinter import Tk
 from tkinter.font import nametofont
 
-from game import Game
 from views import MainView, SettingView, ScoreView
 
 class Window:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self._window = Tk()
-        self.game = Game()
         self._window.geometry("700x700")
         self._window.title('German strong verbs')
         default_font = nametofont("TkDefaultFont")
