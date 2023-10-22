@@ -9,14 +9,15 @@ class Question:
     def __init__(self, words: List[Word]):
         self.word = random.choice(list(filter(lambda w: w.selected ,words)))
         self.form = random.choice(list(self.word.forms.keys()))
-        self._on_answer = None
+        self._on_answer = []
 
     def on_answer(self, cb):
-        self._on_answer = cb
+        self._on_answer.append(cb)
 
     def answer(self, answer: str):
-        is_correct = self.word.forms[self.form] == answer
-        if self._on_answer is not None:
-            self._on_answer(is_correct)
+        correct_answer = self.word.forms[self.form]
+        is_correct = correct_answer == answer
+        for on_answer in self._on_answer:
+            on_answer(is_correct, correct_answer)
         return is_correct
 

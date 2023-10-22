@@ -1,9 +1,10 @@
 from tkinter import Tk
 from tkinter.font import nametofont
 
-from ui.views import MainView, SettingView, ScoreView
+from ui.application import Application
+from ui.window.views import MainView, SettingView, ScoreView
 
-class Window:
+class Window(Application):
     def __init__(self, game):
         self.game = game
         self._window = Tk()
@@ -18,7 +19,7 @@ class Window:
 
     def _on_start(self, tries):
         try:
-            self.game.start(tries)
+            self.game.init(tries)
             self._new_question()
         except IndexError:
             self._setting_view.show_error("Please select at least a verb")

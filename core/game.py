@@ -22,7 +22,7 @@ class Game:
         """
         return self.state.answered < self.state.tries
 
-    def start(self, tries = 1):
+    def init(self, tries: int = 1):
         self.state = State(tries=tries)
 
     def create_question(self):
@@ -46,9 +46,10 @@ class Game:
                 self.words.append(Word(infinitive=row[columns_to_exclude[0]], definition=row[columns_to_exclude[1]],
                                        forms={key: row[key] for key in self.forms}
                                    ))
-    def _handle_answer(self, is_correct: bool):
+    def _handle_answer(self, is_correct: bool, *args):
         if self.state is None:
             return
         self.state.answered += 1
         if is_correct:
             self.state.success += 1
+

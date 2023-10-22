@@ -52,14 +52,14 @@ def test_answer_question():
     assert question.answer(correct_answer) is True
 
 def test_state_answered(game):
-    game.start()
+    game.init()
     question = game.create_question()
     question.answer("ff")
     assert game.state.answered == 1
     assert game.state.success == 0
 
 def test_state_success(game):
-    game.start()
+    game.init()
     question = game.create_question()
     correct_answer = question.word.forms[question.form]
     question.answer(correct_answer)
@@ -67,9 +67,9 @@ def test_state_success(game):
     assert game.state.success == 1
 
 def test_start_state(game):
-    game.start(10)
+    game.init(10)
     assert game.state.tries == 10
     game.state.answered = 2
     game.state.success = 1
-    game.start(2)
+    game.init(2)
     assert game.state == State(tries=2)
