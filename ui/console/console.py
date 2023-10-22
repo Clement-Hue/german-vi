@@ -4,6 +4,12 @@ from ui.application import Application
 if TYPE_CHECKING:
     from core.game import Game
 
+colors = {
+    "blue": '\033[94m',
+    "reset": '\033[0m',
+    "green": '\033[92m'
+}
+
 class Console(Application):
     def __init__(self, game: Game):
         self.game = game
@@ -19,4 +25,4 @@ class Console(Application):
         print(f"\nscore {self.game.state.success} / {self.game.state.answered}")
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args):
-        print("Good answer") if is_correct else print(f"Wrong ! The answer is {correct_answer}")
+        print("Good answer") if is_correct else print(f"Wrong ! The answer is {colors['green']}{correct_answer}{colors['reset']}")

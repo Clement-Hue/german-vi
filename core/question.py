@@ -18,6 +18,6 @@ class Question:
         correct_answer = self.word.forms[self.form]
         is_correct = correct_answer == answer
         for on_answer in self._on_answer:
-            on_answer(is_correct, correct_answer)
+            on_answer(is_correct, correct_answer, answer)
         return is_correct
 
