@@ -5,7 +5,8 @@ from tkinter import Button, Entry, Label, StringVar, Checkbutton,\
 
 class WordSelectionFrame:
     def __init__(self, words, window):
-        self.words = words
+        self.selected_words = []
+        self._words = words
         self._window = window
         self._frame = Frame(self._window)
         self._checkboxes = self._create_checkboxes()
@@ -15,32 +16,34 @@ class WordSelectionFrame:
 
     def _create_checkboxes(self):
         checkboxes = []
-        for i in range(len(self.words)):
-            word = self.words[i]
-            checkbox_var = IntVar(value=1 if word.selected else 0)
+        for word in self._words:
+            checkbox_var = IntVar(value=0)
             checkbox = Checkbutton(self._frame, text=word.infinitive, variable=checkbox_var, font=("Arial", 15))
             checkbox.config(command=lambda w=word, c=checkbox_var: self._on_check(w, c))
-            checkboxes.append((checkbox, word))
+            checkboxes.append(checkbox)
         return checkboxes
 
     def show_words(self):
         self._frame.pack()
         self._btn_frame.pack()
-        for i in range(len(self.words)):
-            self._checkboxes[i][0].grid(row=i // 5, column=i % 5)
+        for i in range(len(self._words)):
+            self._checkboxes[i].grid(row=i // 5, column=i % 5)
 
     def _on_check(self, word, checkbox: IntVar):
-        word.selected = bool(checkbox.get())
+        if checkbox.get():
+            self.selected_words.append(word)
+        else:
+            self.selected_words.remove(word)
 
     def _select_all(self, checkboxes):
+        self.selected_words = self._words
         for checkbox in checkboxes:
-            checkbox[0].select()
-            checkbox[1].selected = True
+            checkbox.select()
 
     def _unselect_all(self, checkboxes):
+        self.selected_words = []
         for checkbox in checkboxes:
-            checkbox[0].deselect()
-            checkbox[1].selected = False
+            checkbox.deselect()
 
 
 class View:
@@ -106,13 +109,13 @@ class SettingView(View):
         super().__init__(window)
         self._words = words
         self._on_start = on_start
-        self._tries = IntVar(value=10)
-        self._start_btn = Button(self._window, text="Start", fg='Green',
-                                 command=lambda: self._on_start(self._tries.get()))
+        self._nb_question = IntVar(value=10)
         self._word_selection = WordSelectionFrame(self._words, self._window)
+        self._start_btn = Button(self._window, text="Start", fg='Green',
+                                 command=lambda: self._on_start(self._nb_question.get(), self._word_selection.selected_words))
         self._try_frame = Frame(self._window)
-        Label(self._try_frame, text="Number of try").pack(side=LEFT)
-        Entry(self._try_frame, textvariable=self._tries, font=("Arial", 20)).pack(side=RIGHT)
+        Label(self._try_frame, text="Number of question").pack(side=LEFT)
+        Entry(self._try_frame, textvariable=self._nb_question, font=("Arial", 20)).pack(side=RIGHT)
         self._error_label = Label(self._window, fg="red")
 
     def _show(self):

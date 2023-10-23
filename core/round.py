@@ -12,6 +12,7 @@ class State:
 
 class Round:
     def __init__(self,words: List[Word], nb_question: int = 1):
+        self.nb_question = nb_question
         self.state = State()
         self.words = words
         self.questions = [self._create_question() for _ in range(nb_question)]
