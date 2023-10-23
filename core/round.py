@@ -27,8 +27,6 @@ class Round:
         return question
 
     def _handle_answer(self, is_correct: bool, *args):
-        if self.state is None:
-            return
         self.state.answered += 1
         if is_correct:
             self.state.success += 1

@@ -1,4 +1,5 @@
 from typing import Dict
+
 class Word:
     def __init__(self, infinitive: str, definition: str, forms: Dict[str, str] = None):
         self.infinitive = infinitive

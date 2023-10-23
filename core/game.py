@@ -24,7 +24,6 @@ class Game:
         """
         return Round(words=selected_words(self.words) if selected_words else self.words, nb_question=nb_question)
 
-
     def _load_words(self, csv_path: str):
         """
         Open csv file and create forms and words attributes
