@@ -19,7 +19,7 @@ class Window(Application):
 
     def _on_start(self, tries):
         try:
-            self.game.init(tries)
+            self.game.new_round(tries)
             self._new_question()
         except IndexError:
             self._setting_view.show_error("Please select at least a verb")

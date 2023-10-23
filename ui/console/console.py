@@ -16,7 +16,7 @@ class Console(Application):
 
     def run(self):
         nb_question = input("Number of questions: ")
-        self.game.init(int(nb_question))
+        self.game.new_round(int(nb_question))
         while self.game:
             question = self.game.create_question()
             question.on_answer(self._handle_answer)

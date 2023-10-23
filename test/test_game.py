@@ -1,5 +1,4 @@
 import pytest
-from core.state import State
 from core.game import Game
 from core.word import Word
 from core.question import Question
@@ -31,7 +30,8 @@ def test_load_forms(game):
     assert game.forms == ["present", "simple past", "past participle"]
 
 def test_generate_question(game):
-    question = game.create_question()
+    rnd = game.new_round()
+    question = rnd.create_question()
     assert question.word in game.words
     assert question.form in game.forms
 
@@ -52,24 +52,34 @@ def test_answer_question():
     assert question.answer(correct_answer) is True
 
 def test_state_answered(game):
-    game.init()
-    question = game.create_question()
+    rnd = game.new_round()
+    question = rnd.create_question()
     question.answer("ff")
-    assert game.state.answered == 1
-    assert game.state.success == 0
+    assert rnd.state.answered == 1
+    assert rnd.state.success == 0
 
 def test_state_success(game):
-    game.init()
-    question = game.create_question()
+    rnd = game.new_round()
+    question = rnd.create_question()
     correct_answer = question.word.forms[question.form]
     question.answer(correct_answer)
-    assert game.state.answered == 1
-    assert game.state.success == 1
+    assert rnd.state.answered == 1
+    assert rnd.state.success == 1
 
-def test_start_state(game):
-    game.init(10)
-    assert game.state.nb_question == 10
-    game.state.answered = 2
-    game.state.success = 1
-    game.init(2)
-    assert game.state == State(nb_question=2)
+def test_round_on_going(game):
+    rnd = game.new_round(5)
+    assert bool(rnd) is True
+    rnd.state.answered = 5
+    assert bool(rnd) is False
+
+def test_select_words(game):
+    rnd = game.new_round(selected_words=lambda words: [words[0]])
+    assert len(rnd.words) == 1
+    assert rnd.words[0] == Word(
+        infinitive="befehlen", definition="to command",
+        forms={
+            "present": "befiehlt",
+            "simple past": "befahl",
+            "past participle": "hat befohlen"
+        }
+    )
