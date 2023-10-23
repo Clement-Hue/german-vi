@@ -15,7 +15,6 @@ class Game:
         self.forms = []
         self._load_words(csv_path)
 
-
     def new_round(self, nb_question: int = 1, selected_words: Callable[[List[Word]], List[Word]] = None):
         """
         Initialise the game with the number of questions

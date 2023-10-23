@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 colors = {
     "blue": '\033[94m',
     "reset": '\033[0m',
-    "green": '\033[92m'
+    "green": '\033[92m',
+    "red": "\033[91m"
 }
 
 class Console(Application):
@@ -25,4 +26,4 @@ class Console(Application):
         print(f"\nscore {rnd.state.success} / {rnd.state.answered}")
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args):
-        print("Good answer") if is_correct else print(f"Wrong ! The answer is {colors['green']}{correct_answer}{colors['reset']}")
+        print(f"{colors['green']}Good answer{colors['reset']}") if is_correct else print(f"{colors['red']}Wrong !{colors['reset']} The answer is {colors['blue']}{correct_answer}{colors['reset']}")
