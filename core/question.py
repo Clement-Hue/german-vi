@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 class Question:
     def __init__(self, words: List[Word]):
-        self.word = random.choice(list(filter(lambda w: w.selected ,words)))
+        self.word = random.choice(words)
         self.form = random.choice(list(self.word.forms.keys()))
         self._on_answer = []
 

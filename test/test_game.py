@@ -31,7 +31,7 @@ def test_load_forms(game):
 
 def test_generate_question(game):
     rnd = game.new_round()
-    question = rnd.create_question()
+    question = rnd.questions[0]
     assert question.word in game.words
     assert question.form in game.forms
 
@@ -53,26 +53,20 @@ def test_answer_question():
 
 def test_state_answered(game):
     rnd = game.new_round()
-    question = rnd.create_question()
+    question = rnd.questions[0]
     question.answer("ff")
     assert rnd.state.answered == 1
     assert rnd.state.success == 0
 
 def test_state_success(game):
     rnd = game.new_round()
-    question = rnd.create_question()
+    question = rnd.questions[0]
     correct_answer = question.word.forms[question.form]
     question.answer(correct_answer)
     assert rnd.state.answered == 1
     assert rnd.state.success == 1
 
-def test_round_on_going(game):
-    rnd = game.new_round(5)
-    assert bool(rnd) is True
-    rnd.state.answered = 5
-    assert bool(rnd) is False
-
-def test_select_words(game):
+def test_selected_words(game):
     rnd = game.new_round(selected_words=lambda words: [words[0]])
     assert len(rnd.words) == 1
     assert rnd.words[0] == Word(

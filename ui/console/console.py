@@ -18,8 +18,7 @@ class Console(Application):
     def run(self):
         nb_question = input("Number of questions: ")
         rnd = self.game.new_round(int(nb_question))
-        while rnd:
-            question = rnd.create_question()
+        for question in rnd.questions:
             question.on_answer(self._handle_answer)
             answer = input(f"\n{question.word.infinitive} ({question.word.definition}) in {question.form}:\n")
             question.answer(answer)
