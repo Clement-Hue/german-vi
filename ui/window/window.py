@@ -26,9 +26,12 @@ class Window(Application):
         self._score_view = ScoreView(self._window, on_restart=self._handle_restart)
 
     def _on_start(self, nb_question, selected_words):
-        self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words)
-        self._state.question_iter = iter(self._state.round.questions)
-        self._handle_continue()
+        try:
+            self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words)
+            self._state.question_iter = iter(self._state.round.questions)
+            self._handle_continue()
+        except IndexError:
+            self._setting_view.show_error("Please select at least one verb")
 
     def run(self):
         self._setting_view()
