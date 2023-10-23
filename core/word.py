@@ -5,7 +5,6 @@ class Word:
         self.infinitive = infinitive
         self.definition = definition
         self.forms = forms
-        self.selected = True
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

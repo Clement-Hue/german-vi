@@ -26,4 +26,5 @@ class Console(Application):
         print(f"\nscore {rnd.state.success} / {rnd.state.answered}")
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args):
-        print(f"{colors['green']}Good answer{colors['reset']}") if is_correct else print(f"{colors['red']}Wrong !{colors['reset']} The answer is {colors['blue']}{correct_answer}{colors['reset']}")
+        print(f"{colors['green']}Good answer{colors['reset']}") if is_correct else\
+            print(f"{colors['red']}Wrong !{colors['reset']} The answer is {colors['blue']}{correct_answer}{colors['reset']}")
