@@ -1,31 +1,26 @@
-from tkinter import Tk
-from tkinter.font import nametofont
 from typing import Iterator
 
+from ui.window.window_impl import WindowTkinter
 from core.question import Question
 from core.round import Round
 from ui.application import Application
-from ui.window.views import MainView, SettingView, ScoreView
 
 class WindowState:
     round: Round
     question_iter: Iterator[Question]
     question: Question
+
 class Window(Application):
     def __init__(self, game):
         self.game = game
         self._state = WindowState()
-        self._window = Tk()
-        self._window.geometry("700x700")
-        self._window.title('German strong verbs')
-        default_font = nametofont("TkDefaultFont")
-        default_font.configure(size=25, family="Arial")
-        self._setting_view = SettingView(self._window, self.game.words,
-                                         on_start=self._on_start)
-        self._main_view = MainView(self._window, on_validate=self._handle_validate, on_continue=self._handle_continue)
-        self._score_view = ScoreView(self._window, on_restart=self._handle_restart)
+        self._window = WindowTkinter()
+        self._setting_view = self._window.create_setting_view(words=self.game.words,
+                                                              on_start=self._handle_start)
+        self._main_view = self._window.create_main_view(on_validate=self._handle_validate, on_continue=self._handle_continue)
+        self._score_view = self._window.create_score_view(on_restart=self._handle_restart)
 
-    def _on_start(self, nb_question, selected_words):
+    def _handle_start(self, nb_question, selected_words):
         try:
             self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words)
             self._state.question_iter = iter(self._state.round.questions)
@@ -35,7 +30,7 @@ class Window(Application):
 
     def run(self):
         self._setting_view()
-        self._window.mainloop()
+        self._window.loop()
 
     def _handle_restart(self):
         self._setting_view()
