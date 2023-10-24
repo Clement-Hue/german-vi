@@ -59,6 +59,8 @@ class View:
             widget.pack_forget()
         self._show(*args, **kwargs)
 
+    def show_error(self, *args, **kwargs):
+        pass
 
 class MainView(View):
     def __init__(self, window, on_validate, on_continue):
@@ -136,7 +138,7 @@ class ScoreView(View):
         self._score_label.pack()
         Button(self._parent_frame, text="Restart", command=self._on_restart).pack()
 
-    def _show(self, success, tries):
-        self._score_label.config(text=f"Score: {success} / {tries}")
+    def _show(self, success: int, nb_question: int):
+        self._score_label.config(text=f"Score: {success} / {nb_question}")
         self._parent_frame.pack(expand=True)
         self._parent_frame.focus_set()
