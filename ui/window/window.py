@@ -17,9 +17,9 @@ class Window(Application):
         self._state = WindowState()
         self._window_impl = WindowTkinter()
         self._view_manager = ViewsManager(
-            self._window_impl.create_setting_view(words=self.game.words, on_start=self._handle_start),
-            self._window_impl.create_main_view(on_validate=self._handle_validate, on_continue=self._handle_continue),
-            self._window_impl.create_score_view(on_restart=self._handle_restart)
+            setting=self._window_impl.create_setting_view(words=self.game.words, on_start=self._handle_start),
+            main=self._window_impl.create_main_view(on_validate=self._handle_validate, on_continue=self._handle_continue),
+            score=self._window_impl.create_score_view(on_restart=self._handle_restart)
         )
 
     def _handle_start(self, nb_question, selected_words):
@@ -31,23 +31,23 @@ class Window(Application):
             self._view_manager.show_error("Please select at least one verb")
 
     def run(self):
-        self._view_manager.show("Setting")
+        self._view_manager.show("setting")
         self._window_impl.loop()
 
     def _handle_restart(self):
-        self._view_manager.show("Setting")
+        self._view_manager.show("setting")
 
     def _handle_continue(self):
         self._state.question = next(self._state.question_iter, None)
         if self._state.question is None:
-            self._view_manager.show("Score",success=self._state.round.state.success, nb_question=self._state.round.nb_question)
+            self._view_manager.show("score",success=self._state.round.state.success, nb_question=self._state.round.nb_question)
             return
         self._state.question.on_answer(self._handle_answer)
-        self._view_manager.show("Main",
+        self._view_manager.show("main",
             f"{self._state.question.word.infinitive} / {self._state.question.word.definition}\n"
             f"{self._state.question.form}")
 
-    def _handle_answer(self, is_correct: bool, correct_answer: str, answer: str):
+    def _handle_answer(self, is_correct: bool, correct_answer: str, *args, **kwargs):
         if not is_correct:
             self._view_manager.show_error(correct_answer)
             return

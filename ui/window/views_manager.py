@@ -4,15 +4,15 @@ if TYPE_CHECKING:
     from ui.window.views import View
 
 class ViewsManager:
-    def __init__(self, *views: View):
+    def __init__(self, **views: View):
         self.views = views
         self.current_view: Optional[View] = None
 
     def show(self, view_name: str, *args, **kwargs):
         try:
-            self.current_view = next(filter(lambda v: v.__class__.__name__.replace("View", "") == view_name, self.views))
+            self.current_view = self.views[view_name]
             self.current_view(*args, **kwargs)
-        except StopIteration as e:
+        except KeyError as e:
             raise Exception(f"View {view_name} doesn't exist") from e
 
     def show_error(self, message: str):
