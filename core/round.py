@@ -22,7 +22,9 @@ class Round:
         question.on_answer(self._handle_answer)
         return question
 
-    def _handle_answer(self, is_correct: bool, *args):
+    def _handle_answer(self, is_correct: bool, is_answered: bool, *args, **kwargs):
+        if is_answered:
+            return
         self.state.answered += 1
         if is_correct:
             self.state.success += 1

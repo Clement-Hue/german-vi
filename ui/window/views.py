@@ -63,7 +63,7 @@ class View:
         pass
 
 class MainView(View):
-    def __init__(self, window, on_validate, on_continue):
+    def __init__(self, window, on_validate):
         super().__init__(window)
         self._answer = StringVar()
         self._label = StringVar()
@@ -71,8 +71,6 @@ class MainView(View):
         Label(self._parent_frame, textvariable=self._label).pack()
         self._create_answer_frame(self._parent_frame,on_validate=on_validate)
         self._validate_w = Button(self._parent_frame, text="Validate", fg='blue', command=lambda: on_validate(self._answer.get()))
-        self._continue_w = Button(self._parent_frame, text="Continue", fg='blue', command=on_continue)
-        self._continue_w.bind("<Return>", lambda e: on_continue())
         self._error_w = Label(self._parent_frame, fg="red")
 
     def _create_answer_frame(self, parent, on_validate):
@@ -95,13 +93,9 @@ class MainView(View):
         self._parent_frame.pack(expand=True)
         self._validate_w.pack()
         self._textfield_w.focus_set()
-        self._continue_w.pack_forget()
         self._error_w.pack_forget()
 
     def show_error(self, expected_answer):
-        self._validate_w.pack_forget()
-        self._continue_w.pack()
-        self._continue_w.focus_set()
         self._error_w.config(text=f"WRONG, the answer was {expected_answer}")
         self._error_w.pack()
 

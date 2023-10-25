@@ -65,11 +65,14 @@ def test_state_success(game):
     question.answer(correct_answer)
     assert rnd.state.answered == 1
     assert rnd.state.success == 1
+    question.answer(correct_answer)
+    assert rnd.state.answered == 1
+    assert rnd.state.success == 1
 
 def test_selected_words(game):
     rnd = game.new_round(selected_words=lambda words: [words[0]])
-    assert len(rnd._words) == 1
-    assert rnd._words[0] == Word(
+    assert len(rnd.words) == 1
+    assert rnd.words[0] == Word(
         infinitive="befehlen", definition="to command",
         forms={
             "present": "befiehlt",
