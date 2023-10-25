@@ -78,14 +78,14 @@ class MainView(View):
         Label(frame, text="Answer:", font=("Arial", 15)).pack(side=TOP)
         self._textfield_w = Entry(frame, textvariable=self._answer, bg='white', font=("Arial", 20), bd=5)
         self._textfield_w.bind("<Return>", lambda e: on_validate(self._answer.get()))
+        self._textfield_w.bind("<Alt-s>", lambda e: self._insert_letter_eszett())
         self._textfield_w.pack(side=LEFT)
-        Button(frame, text="ß", command=self._add_eszett).pack(side=RIGHT, padx=10)
+        Button(frame, text="ß", command=self._insert_letter_eszett).pack(side=RIGHT, padx=10)
         frame.pack()
 
-    def _add_eszett(self):
-        self._answer.set(self._answer.get() + "ß")
-        pos = self._textfield_w.index(INSERT)
-        self._textfield_w.icursor(pos + 1)
+    def _insert_letter_eszett(self):
+        current_position = self._textfield_w.index(INSERT)
+        self._textfield_w.insert(current_position, "ß")
 
     def _show(self, label: str):
         self._label.set(label)
@@ -95,8 +95,8 @@ class MainView(View):
         self._textfield_w.focus_set()
         self._error_w.pack_forget()
 
-    def show_error(self, expected_answer):
-        self._error_w.config(text=f"WRONG, the answer was {expected_answer}")
+    def show_error(self, message: str):
+        self._error_w.config(text=message)
         self._error_w.pack()
 
 

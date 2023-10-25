@@ -48,7 +48,7 @@ class Window(Application):
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args, **kwargs):
         if not is_correct:
-            self._view_manager.show_error(correct_answer)
+            self._view_manager.show_error(f"WRONG, the answer was {correct_answer}")
             return
         self._show_next_question()
     def _handle_validate(self, answer):
