@@ -3,43 +3,45 @@ import tkinter as tk
 
 
 class WordSelectionFrame:
-    def __init__(self, words, window):
+    def __init__(self, words, parent):
         self.selected_words = []
         self._words = words
-        self._window = window
-        self._frame = tk.Frame(self._window)
-        self._checkboxes = self._create_checkboxes()
-        self._btn_frame = tk.Frame(self._window)
-        tk.Button(self._btn_frame, text="All", command=lambda: self._select_all(self._checkboxes)).pack(side=tk.LEFT)
-        tk.Button(self._btn_frame, text="None", command=lambda: self._unselect_all(self._checkboxes)).pack(side=tk.RIGHT)
+        self._main_frame = tk.Frame(parent)
+        self._checkboxes_frame = self._create_checkboxes_frame(self._main_frame)
+        self._btn_frame = self._create_btn_frame(self._main_frame)
+        self._packing()
 
-    def _create_checkboxes(self):
-        checkboxes = []
-        for word in self._words:
-            checkbox_var = tk.IntVar(value=0)
-            checkbox = tk.Checkbutton(self._frame, text=word.infinitive, variable=checkbox_var, font=("Arial", 15))
-            checkbox.config(command=lambda w=word, c=checkbox_var: self._on_check(w, c))
-            checkboxes.append(checkbox)
-        return checkboxes
-
-    def show_words(self):
-        self._frame.pack()
+    def pack(self, *args, **kwargs):
+        self._main_frame.pack(*args, **kwargs)
+    def _packing(self):
+        self._checkboxes_frame.pack()
         self._btn_frame.pack()
-        for i in range(len(self._words)):
-            self._checkboxes[i].grid(row=i // 5, column=i % 5)
+    def _create_btn_frame(self, parent):
+        frame = tk.Frame(parent)
+        tk.Button(frame, text="All", command=lambda: self._handle_select_all(self._checkboxes_frame.winfo_children())).pack(side=tk.LEFT)
+        tk.Button(frame, text="None", command=lambda: self._handle_unselect_all(self._checkboxes_frame.winfo_children())).pack(side=tk.RIGHT)
+        return frame
+    def _create_checkboxes_frame(self, parent):
+        frame = tk.Frame(parent)
+        for i,word in enumerate(self._words):
+            checkbox_var = tk.IntVar(value=0)
+            checkbox = tk.Checkbutton(frame, text=word.infinitive, variable=checkbox_var, font=("Arial", 15),
+                                      command=lambda w=word, c=checkbox_var: self._handle_check(w, c))
+            checkbox.grid(row=i // 5, column=i % 5)
+        return frame
 
-    def _on_check(self, word, checkbox: tk.IntVar):
+    def _handle_check(self, word, checkbox: tk.IntVar):
         if checkbox.get():
             self.selected_words.append(word)
         else:
             self.selected_words.remove(word)
 
-    def _select_all(self, checkboxes):
+    def _handle_select_all(self, checkboxes):
         self.selected_words = self._words
         for checkbox in checkboxes:
             checkbox.select()
 
-    def _unselect_all(self, checkboxes):
+    def _handle_unselect_all(self, checkboxes):
         self.selected_words = []
         for checkbox in checkboxes:
             checkbox.deselect()
@@ -74,14 +76,14 @@ class MainView(View):
         self._label_w = tk.Label(self._view_frame)
         self._answer_frame = self._create_answer_frame(self._view_frame, on_validate=on_validate)
         self._validate_w = tk.Button(self._view_frame, text="Validate", fg='blue', command=lambda: on_validate(self._textfield_w.get()))
-        self._error_w = tk.Label(self._view_frame, fg="red")
+        self._error_label_w = tk.Label(self._view_frame, fg="red")
         self._packing()
 
     def _packing(self):
         self._label_w.pack()
         self._answer_frame.pack()
         self._validate_w.pack()
-        self._error_w.pack()
+        self._error_label_w.pack()
 
     def _create_answer_frame(self, parent, on_validate):
         frame = tk.Frame(parent)
@@ -98,49 +100,54 @@ class MainView(View):
         self._textfield_w.insert(current_position, "ß")
 
     def _show(self, label: str):
-        self._error_w.config(text="")
+        self._error_label_w.config(text="")
         self._label_w.config(text=label)
         self._textfield_w.delete(0, tk.END)
         self._view_frame.pack(expand=True)
         self._textfield_w.focus_set()
 
     def show_error(self, message: str):
-        self._error_w.config(text=message)
+        self._error_label_w.config(text=message)
 
 
 class SettingView(View):
     def __init__(self, window, words, on_start):
         super().__init__(window)
-        self._words = words
-        self._on_start = on_start
+        self._view_frame = tk.Frame()
         self._nb_question = tk.IntVar(value=10)
-        self._word_selection = WordSelectionFrame(self._words, self._window)
-        self._start_btn = tk.Button(self._window, text="Start", fg='Green',
-                                 command=lambda: self._on_start(self._nb_question.get(), self._word_selection.selected_words))
-        self._try_frame = tk.Frame(self._window)
-        tk.Label(self._try_frame, text="Number of question").pack(side=tk.LEFT)
-        tk.Entry(self._try_frame, textvariable=self._nb_question, font=("Arial", 20)).pack(side=tk.RIGHT)
-        self._error_label = tk.Label(self._window, fg="red")
+        self._word_selection_frame = WordSelectionFrame(words, self._view_frame)
+        self._start_btn_w = tk.Button(self._view_frame, text="Start", fg='Green',
+                                      command=lambda: on_start(self._nb_question.get(), self._word_selection_frame.selected_words))
+        self._nb_question_frame = self._create_question_frame(self._view_frame)
+        self._error_label_w = tk.Label(self._window, fg="red")
+        self._packing()
 
+    def _packing(self):
+        self._word_selection_frame.pack()
+        self._nb_question_frame.pack()
+        self._start_btn_w.pack()
+        self._error_label_w.pack()
+    def _create_question_frame(self, parent):
+        frame = tk.Frame(parent)
+        tk.Label(frame, text="Number of question").pack(side=tk.LEFT)
+        tk.Entry(frame, textvariable=self._nb_question, font=("Arial", 20)).pack(side=tk.RIGHT)
+        return frame
     def _show(self):
-        self._word_selection.show_words()
-        self._try_frame.pack()
-        self._start_btn.pack()
+        self._view_frame.pack()
 
     def show_error(self, error: str):
-        self._error_label.config(text=error)
-        self._error_label.pack()
+        self._error_label_w.config(text=error)
 
 class ScoreView(View):
     def __init__(self, window, on_restart):
         super().__init__(window)
         self._on_restart = on_restart
-        self._parent_frame = tk.Frame(window)
-        self._score_label = tk.Label(self._parent_frame, font=("Arial", 50))
+        self._view_frame = tk.Frame(window)
+        self._score_label = tk.Label(self._view_frame, font=("Arial", 50))
         self._score_label.pack()
-        tk.Button(self._parent_frame, text="Restart", command=self._on_restart).pack()
+        tk.Button(self._view_frame, text="Restart", command=self._on_restart).pack()
 
     def _show(self, success: int, nb_question: int):
         self._score_label.config(text=f"Score: {success} / {nb_question}")
-        self._parent_frame.pack(expand=True)
-        self._parent_frame.focus_set()
+        self._view_frame.pack(expand=True)
+        self._view_frame.focus_set()
