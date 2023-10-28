@@ -1,6 +1,7 @@
 import csv
 from typing import Callable, List
 from core.word import Word
+from core.question import Question
 from core.round import Round
 
 
@@ -23,8 +24,9 @@ class Game:
         :param selected_forms: callback which return a subarray of the form list
         :param nb_question: number of questions ask during the game
         """
-        return Round(words=selected_words(self.words) if selected_words else self.words, nb_question=nb_question,
-                     selected_forms=selected_forms)
+        return Round(question_factory= lambda : Question(
+               words=selected_words(self.words) if selected_words else self.words, selected_forms=selected_forms
+        ), nb_question=nb_question)
 
     def _load_words(self, csv_path: str):
         """

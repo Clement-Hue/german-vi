@@ -1,9 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Callable
+from typing import Callable
 from dataclasses import dataclass
 from core.question import Question
-if TYPE_CHECKING:
-    from core.word import Word
 
 @dataclass
 class State:
@@ -11,17 +9,15 @@ class State:
     success: int = 0
 
 class Round:
-    def __init__(self, words: List[Word], nb_question: int = 1,
-                 selected_forms: Callable[[List[str]], List[str]]  = None
+    def __init__(self, question_factory: Callable[[], Question],
+                 nb_question: int = 1,
                  ):
-        self.nb_question = nb_question
-        self.selected_forms = selected_forms
+        self._question_factory = question_factory
         self.state = State()
-        self.words = words
         self.questions = [self._create_question() for _ in range(nb_question)]
 
     def _create_question(self):
-        question = Question(words=self.words, selected_forms=self.selected_forms)
+        question = self._question_factory()
         question.on_answer(self._handle_answer)
         return question
 

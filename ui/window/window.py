@@ -39,12 +39,12 @@ class Window(Application):
     def _show_next_question(self):
         self._state.question = next(self._state.question_iter, None)
         if self._state.question is None:
-            self._view_manager.show("score",success=self._state.round.state.success, nb_question=self._state.round.nb_question)
+            self._view_manager.show("score",success=self._state.round.state.success, nb_question=len(self._state.round.questions))
             return
         self._state.question.on_answer(self._handle_answer)
         self._view_manager.show("main",
             infinitive=self._state.question.word.infinitive ,definition=self._state.question.word.definition,
-            form=self._state.question.form, current=self._state.round.state.answered + 1, nb_question=self._state.round.nb_question)
+            form=self._state.question.form, current=self._state.round.state.answered + 1, nb_question=len(self._state.round.questions))
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args, **kwargs):
         if not is_correct:
