@@ -43,8 +43,8 @@ class Window(Application):
             return
         self._state.question.on_answer(self._handle_answer)
         self._view_manager.show("main",
-            f"{self._state.question.word.infinitive} / {self._state.question.word.definition}\n"
-            f"{self._state.question.form}")
+            infinitive=self._state.question.word.infinitive ,definition=self._state.question.word.definition,
+            form=self._state.question.form, current=self._state.round.state.answered + 1, nb_question=self._state.round.nb_question)
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args, **kwargs):
         if not is_correct:

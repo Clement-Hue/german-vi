@@ -73,21 +73,22 @@ class MainView(View):
     def __init__(self, window, on_validate):
         super().__init__(window)
         self._view_frame = tk.Frame(window)
-        self._label_w = tk.Label(self._view_frame)
+        self._counter_label_w = tk.Label(self._view_frame)
+        self._question_label_w = tk.Label(self._view_frame)
         self._answer_frame = self._create_answer_frame(self._view_frame, on_validate=on_validate)
         self._validate_w = tk.Button(self._view_frame, text="Validate", fg='blue', command=lambda: on_validate(self._textfield_w.get()))
         self._error_label_w = tk.Label(self._view_frame, fg="red")
         self._packing()
 
     def _packing(self):
-        self._label_w.pack()
+        self._counter_label_w.pack(pady=(0,50))
+        self._question_label_w.pack()
         self._answer_frame.pack()
         self._validate_w.pack()
         self._error_label_w.pack()
 
     def _create_answer_frame(self, parent, on_validate):
         frame = tk.Frame(parent)
-        tk.Label(frame, text="Answer:", font=("Arial", 15)).pack(side=tk.TOP)
         self._textfield_w = tk.Entry(frame, bg='white', font=("Arial", 20), bd=5)
         self._textfield_w.bind("<Return>", lambda e: on_validate(self._textfield_w.get()))
         self._textfield_w.bind("<Alt-s>", lambda e: self._insert_letter_eszett())
@@ -99,9 +100,10 @@ class MainView(View):
         current_position = self._textfield_w.index(tk.INSERT)
         self._textfield_w.insert(current_position, "ß")
 
-    def _show(self, label: str):
+    def _show(self, infinitive: str, definition: str, form: str, current: int, nb_question: int):
         self._error_label_w.config(text="")
-        self._label_w.config(text=label)
+        self._question_label_w.config(text=f"{infinitive} / {definition}\n{form}")
+        self._counter_label_w.config(text=f"{current} / {nb_question}")
         self._textfield_w.delete(0, tk.END)
         self._view_frame.pack(expand=True)
         self._textfield_w.focus_set()

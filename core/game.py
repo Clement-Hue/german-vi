@@ -15,13 +15,16 @@ class Game:
         self.forms = []
         self._load_words(csv_path)
 
-    def new_round(self, nb_question: int = 1, selected_words: Callable[[List[Word]], List[Word]] = None):
+    def new_round(self, nb_question: int = 1, selected_words: Callable[[List[Word]], List[Word]] = None,
+                  selected_forms: Callable[[List[str]], List[str]]  = None):
         """
         Initialise the game with the number of questions
         :param selected_words: callback which return a subarray of the word list
+        :param selected_forms: callback which return a subarray of the form list
         :param nb_question: number of questions ask during the game
         """
-        return Round(words=selected_words(self.words) if selected_words else self.words, nb_question=nb_question)
+        return Round(words=selected_words(self.words) if selected_words else self.words, nb_question=nb_question,
+                     selected_forms=selected_forms)
 
     def _load_words(self, csv_path: str):
         """

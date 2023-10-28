@@ -35,6 +35,11 @@ def test_generate_question(game):
     assert question.word in game.words
     assert question.form in game.forms
 
+def test_generate_question_with_specific_forms(game):
+    rnd = game.new_round(nb_question=5, selected_forms=lambda f: [f[0]])
+    for question in rnd.questions:
+        assert question.form == game.forms[0]
+
 def test_answer_question():
     forms = {
         "present": "beginnt",

@@ -1,14 +1,17 @@
 from __future__ import annotations
 import random
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from core.game import Word
 
 
 class Question:
-    def __init__(self, words: List[Word]):
+    def __init__(self, words: List[Word],
+                 selected_forms: Callable[[List[str]], List[str]]  = None
+                 ):
         self.word = random.choice(words)
-        self.form = random.choice(list(self.word.forms.keys()))
+        forms = list(self.word.forms.keys())
+        self.form = random.choice(selected_forms(forms) if selected_forms is not None else forms)
         self._on_answer = []
         self.is_answered = False
 
