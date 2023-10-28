@@ -4,7 +4,6 @@ from typing import List, TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from core.game import Word
 
-
 class Question:
     def __init__(self, words: List[Word],
                  selected_forms: Callable[[List[str]], List[str]]  = None

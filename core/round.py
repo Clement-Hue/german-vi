@@ -12,8 +12,8 @@ class Round:
     def __init__(self, question_factory: Callable[[], Question],
                  nb_question: int = 1,
                  ):
-        self._question_factory = question_factory
         self.state = State()
+        self._question_factory = question_factory
         self.questions = [self._create_question() for _ in range(nb_question)]
 
     def _create_question(self):

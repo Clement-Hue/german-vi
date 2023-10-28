@@ -17,7 +17,9 @@ class Window(Application):
         self._state = WindowState()
         self._window_impl = WindowTkinter()
         self._view_manager = ViewsManager(
-            setting=self._window_impl.create_setting_view(words=self.game.words, on_start=self._handle_start),
+            setting=self._window_impl.create_setting_view(words=self.game.words,
+                                                          forms=self.game.forms,
+                                                          on_start=self._handle_start),
             main=self._window_impl.create_main_view(on_validate=self._handle_validate),
             score=self._window_impl.create_score_view(on_restart=self._handle_restart)
         )
@@ -25,13 +27,17 @@ class Window(Application):
     def run(self):
         self._view_manager.show("setting")
         self._window_impl.loop()
-    def _handle_start(self, nb_question, selected_words):
-        try:
-            self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words)
-            self._state.question_iter = iter(self._state.round.questions)
-            self._show_next_question()
-        except IndexError:
-            self._view_manager.show_error("Please select at least one verb")
+    def _handle_start(self, nb_question, selected_words, selected_form):
+        if not selected_form:
+            self._view_manager.show_error("Please select at least one form")
+            return
+        if not selected_words:
+            self._view_manager.show_error("Please select at least one word")
+            return
+        self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words,
+                                                selected_forms= lambda _ : selected_form)
+        self._state.question_iter = iter(self._state.round.questions)
+        self._show_next_question()
 
     def _handle_restart(self):
         self._view_manager.show("setting")

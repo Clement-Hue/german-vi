@@ -1,12 +1,15 @@
 from abc import abstractmethod
+from typing import Callable, TypeVar, Generic
 import tkinter as tk
 
+T = TypeVar("T")
 
-class WordSelectionFrame:
-    def __init__(self, words, parent):
-        self.selected_words = []
-        self._words = words
-        self._main_frame = tk.Frame(parent)
+class CheckboxesFrame(Generic[T]):
+    def __init__(self, values: T, parent, title: str, checkbox_label: Callable[[T], str]):
+        self.selected = []
+        self._checkbox_label = checkbox_label
+        self._values = values
+        self._main_frame = tk.LabelFrame(parent, text=title)
         self._checkboxes_frame = self._create_checkboxes_frame(self._main_frame)
         self._btn_frame = self._create_btn_frame(self._main_frame)
         self._packing()
@@ -22,27 +25,28 @@ class WordSelectionFrame:
         tk.Button(frame, text="None", command=lambda: self._handle_unselect_all(self._checkboxes_frame.winfo_children())).pack(side=tk.RIGHT)
         return frame
     def _create_checkboxes_frame(self, parent):
+        checkbox_per_row = 8
         frame = tk.Frame(parent)
-        for i,word in enumerate(self._words):
+        for i,value in enumerate(self._values):
             checkbox_var = tk.IntVar(value=0)
-            checkbox = tk.Checkbutton(frame, text=word.infinitive, variable=checkbox_var, font=("Arial", 15),
-                                      command=lambda w=word, c=checkbox_var: self._handle_check(w, c))
-            checkbox.grid(row=i // 5, column=i % 5)
+            checkbox = tk.Checkbutton(frame, text=self._checkbox_label(value), variable=checkbox_var, font=("Arial", 15),
+                                      command=lambda v=value, c=checkbox_var: self._handle_check(v, c))
+            checkbox.grid(row=i // checkbox_per_row, column=i % checkbox_per_row)
         return frame
 
-    def _handle_check(self, word, checkbox: tk.IntVar):
+    def _handle_check(self, value, checkbox: tk.IntVar):
         if checkbox.get():
-            self.selected_words.append(word)
+            self.selected.append(value)
         else:
-            self.selected_words.remove(word)
+            self.selected.remove(value)
 
     def _handle_select_all(self, checkboxes):
-        self.selected_words = self._words
+        self.selected = self._values
         for checkbox in checkboxes:
             checkbox.select()
 
     def _handle_unselect_all(self, checkboxes):
-        self.selected_words = []
+        self.selected = []
         for checkbox in checkboxes:
             checkbox.deselect()
 
@@ -113,19 +117,22 @@ class MainView(View):
 
 
 class SettingView(View):
-    def __init__(self, window, words, on_start):
+    def __init__(self, window, words, forms, on_start):
         super().__init__(window)
         self._view_frame = tk.Frame()
         self._nb_question = tk.IntVar(value=10)
-        self._word_selection_frame = WordSelectionFrame(words, self._view_frame)
+        self._word_selection_frame = CheckboxesFrame(words, self._view_frame, title="Word list", checkbox_label=lambda v: v.infinitive)
+        self._form_selection_frame = CheckboxesFrame(forms, self._view_frame, title="Form list", checkbox_label=lambda f: f)
         self._start_btn_w = tk.Button(self._view_frame, text="Start", fg='Green',
-                                      command=lambda: on_start(self._nb_question.get(), self._word_selection_frame.selected_words))
+                                      command=lambda: on_start(self._nb_question.get(), self._word_selection_frame.selected,
+                                                               self._form_selection_frame.selected))
         self._nb_question_frame = self._create_question_frame(self._view_frame)
-        self._error_label_w = tk.Label(self._window, fg="red")
+        self._error_label_w = tk.Label(self._view_frame, fg="red")
         self._packing()
 
     def _packing(self):
-        self._word_selection_frame.pack()
+        self._word_selection_frame.pack(pady=20)
+        self._form_selection_frame.pack(pady=20)
         self._nb_question_frame.pack()
         self._start_btn_w.pack()
         self._error_label_w.pack()
