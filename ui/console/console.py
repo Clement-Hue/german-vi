@@ -20,7 +20,7 @@ class Console(Application):
         rnd = self.game.new_round(int(nb_question))
         for question in rnd.questions:
             question.on_answer(self._handle_answer)
-            answer = input(f"\n{question.word.infinitive} ({question.word.definition}) in {question.form}:\n")
+            answer = input(f"\n{question.word.infinitive} ({question.word.definition}) in {question.tense}:\n")
             question.answer(answer)
         print(f"\nscore {rnd.state.success} / {rnd.state.answered}")
 

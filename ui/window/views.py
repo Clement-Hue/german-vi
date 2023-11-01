@@ -104,9 +104,9 @@ class MainView(View):
         current_position = self._textfield_w.index(tk.INSERT)
         self._textfield_w.insert(current_position, "ß")
 
-    def _show(self, infinitive: str, definition: str, form: str, current: int, nb_question: int):
+    def _show(self, infinitive: str, definition: str, tense: str, current: int, nb_question: int):
         self._error_label_w.config(text="")
-        self._question_label_w.config(text=f"{infinitive} / {definition}\n{form}")
+        self._question_label_w.config(text=f"{infinitive} / {definition}\n{tense}")
         self._counter_label_w.config(text=f"{current} / {nb_question}")
         self._textfield_w.delete(0, tk.END)
         self._view_frame.pack(expand=True)
@@ -117,22 +117,22 @@ class MainView(View):
 
 
 class SettingView(View):
-    def __init__(self, window, words, forms, on_start):
+    def __init__(self, window, words, tenses, on_start):
         super().__init__(window)
         self._view_frame = tk.Frame()
         self._nb_question = tk.IntVar(value=10)
         self._word_selection_frame = CheckboxesFrame(words, self._view_frame, title="Word list", checkbox_label=lambda v: v.infinitive)
-        self._form_selection_frame = CheckboxesFrame(forms, self._view_frame, title="Form list", checkbox_label=lambda f: f)
+        self._tense_selection_frame = CheckboxesFrame(tenses, self._view_frame, title="tense list", checkbox_label=lambda f: f)
         self._start_btn_w = tk.Button(self._view_frame, text="Start", fg='Green',
                                       command=lambda: on_start(self._nb_question.get(), self._word_selection_frame.selected,
-                                                               self._form_selection_frame.selected))
+                                                               self._tense_selection_frame.selected))
         self._nb_question_frame = self._create_question_frame(self._view_frame)
         self._error_label_w = tk.Label(self._view_frame, fg="red")
         self._packing()
 
     def _packing(self):
         self._word_selection_frame.pack(pady=20)
-        self._form_selection_frame.pack(pady=20)
+        self._tense_selection_frame.pack(pady=20)
         self._nb_question_frame.pack()
         self._start_btn_w.pack()
         self._error_label_w.pack()

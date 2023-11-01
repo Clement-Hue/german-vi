@@ -18,7 +18,7 @@ class Window(Application):
         self._window_impl = WindowTkinter()
         self._view_manager = ViewsManager(
             setting=self._window_impl.create_setting_view(words=self.game.words,
-                                                          forms=self.game.forms,
+                                                          tenses=self.game.tenses,
                                                           on_start=self._handle_start),
             main=self._window_impl.create_main_view(on_validate=self._handle_validate),
             score=self._window_impl.create_score_view(on_restart=self._handle_restart)
@@ -27,15 +27,15 @@ class Window(Application):
     def run(self):
         self._view_manager.show("setting")
         self._window_impl.loop()
-    def _handle_start(self, nb_question, selected_words, selected_form):
-        if not selected_form:
-            self._view_manager.show_error("Please select at least one form")
+    def _handle_start(self, nb_question, selected_words, selected_tense):
+        if not selected_tense:
+            self._view_manager.show_error("Please select at least one tense")
             return
         if not selected_words:
             self._view_manager.show_error("Please select at least one word")
             return
         self._state.round = self.game.new_round(nb_question, selected_words=lambda _: selected_words,
-                                                selected_forms= lambda _ : selected_form)
+                                                selected_tenses= lambda _ : selected_tense)
         self._state.question_iter = iter(self._state.round.questions)
         self._show_next_question()
 
@@ -50,7 +50,7 @@ class Window(Application):
         self._state.question.on_answer(self._handle_answer)
         self._view_manager.show("main",
             infinitive=self._state.question.word.infinitive ,definition=self._state.question.word.definition,
-            form=self._state.question.form, current=self._state.round.state.answered + 1, nb_question=len(self._state.round.questions))
+            tense=self._state.question.tense, current=self._state.round.state.answered + 1, nb_question=len(self._state.round.questions))
 
     def _handle_answer(self, is_correct: bool, correct_answer: str, *args, **kwargs):
         if not is_correct:
